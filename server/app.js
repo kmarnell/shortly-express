@@ -85,21 +85,31 @@ app.post('/links',
 });
 
 app.post('/signup', (req, res, next) => {
-  
+  var username = req.body.username;
   var hashedPassword = models.Users.hashPassword(req.body.password);
 
-
-  return models.Users.create({'username': req.body.username, 'password': hashedPassword})
-    .then(() => {
-      //res.status(200);
-      res.end();
+  return models.Users.get({ username })
+    .then(existinguser => {
+      console.log(existinguser, "EXISTING USER");
+      if (!existinguser){
+        throw existinguser;
+      }
+      res.redirect('/login');
     })
     .error(error => {
       res.status(500).send(error);
+      console.log("ERRORRRRRRRR")
     })
     .catch(user => {
-      res.status(200).send(user);
+      console.log("CREATING")
+      return models.Users.create({'username': req.body.username, 'password': hashedPassword})
     })
+    .then(() => {
+        //res.status(200);
+        res.redirect('/');
+        res.end();
+    })
+    
 
 });
 
