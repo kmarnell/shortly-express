@@ -86,32 +86,53 @@ app.post('/links',
 
 app.post('/signup', (req, res, next) => {
   var username = req.body.username;
-  var hashedPassword = models.Users.hashPassword(req.body.password);
+  var hashedPassword = utils.hashPassword(req.body.password);
 
   return models.Users.get({ username })
+
     .then(existinguser => {
-      console.log(existinguser, "EXISTING USER");
       if (!existinguser){
-        throw existinguser;
+        models.Users.create({'username': req.body.username, 'password': hashedPassword})
+        res.redirect('/');
+        res.end();
+      } else {
+        res.redirect('/login');
+        res.end();
       }
-      res.redirect('/login');
     })
-    .error(error => {
+    .catch(error => {
       res.status(500).send(error);
       console.log("ERRORRRRRRRR")
     })
-    .catch(user => {
-      console.log("CREATING")
-      return models.Users.create({'username': req.body.username, 'password': hashedPassword})
-    })
-    .then(() => {
-        //res.status(200);
-        res.redirect('/');
+});
+
+app.post('/login', (req, res, next) => {
+  var username = req.body.username;
+  var hashedPassword = utils.hashPassword(req.body.password);
+  
+
+  return models.Users.get({ username })
+  .then(existinguser => {
+    if (!existinguser){
+      res.redirect('/signup');
+      res.end();
+    } else {
+      if (existinguser.password === hashedPassword){
+        res.redirect('/')
         res.end();
-    })
-    
+          //open session here?
+      } else {
+        res.redirect('/login');
+        res.end();
+      }
+    }
+  })
+  .catch(error => {
+    res.status(500).send(error);
+  })
 
 });
+
 
 /************************************************************/
 // Write your authentication routes here

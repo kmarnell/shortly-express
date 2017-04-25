@@ -23,7 +23,7 @@ module.exports = (db) => {
           id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
           linkId INT,
           timestamp TIMESTAMP
-        );`);
+        );`)
     })
     .then(() => {
       return db.queryAsync(`
@@ -33,9 +33,20 @@ module.exports = (db) => {
           password VARCHAR (255),
           timestamp TIMESTAMP, 
           UNIQUE (username)
-        );`);
+        );`)
+    })
+    .then(() => {
+      return db.queryAsync(`
+        CREATE TABLE IF NOT EXISTS sessions (
+          id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+          hash VARCHAR(255),
+          user_id INT,
+          timestamp TIMESTAMP
+        );`)
     })
     .error(err => {
       console.log(err);
     });
 };
+
+//FOREIGN KEY REFERENCES users(id),
