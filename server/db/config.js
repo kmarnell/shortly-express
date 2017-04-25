@@ -25,10 +25,16 @@ module.exports = (db) => {
           timestamp TIMESTAMP
         );`);
     })
-  /************************************************************/
-  /*          Add additional schema queries here              */
-  /************************************************************/
-
+    .then(() => {
+      return db.queryAsync(`
+        CREATE TABLE IF NOT EXISTS users (
+          id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
+          username VARCHAR (255), 
+          password VARCHAR (255),
+          timestamp TIMESTAMP, 
+          UNIQUE (username)
+        );`);
+    })
     .error(err => {
       console.log(err);
     });

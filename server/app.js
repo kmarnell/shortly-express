@@ -40,6 +40,14 @@ app.get('/links',
     });
 });
 
+app.get('/signup', (req, res) => {
+  res.render('signup');
+});
+
+app.get('/login', (req, res) => {
+  res.render('login');
+});
+
 app.post('/links', 
 (req, res, next) => {
   var url = req.body.url;
@@ -74,6 +82,25 @@ app.post('/links',
     .catch(link => {
       res.status(200).send(link);
     });
+});
+
+app.post('/signup', (req, res, next) => {
+  
+  var hashedPassword = models.Users.hashPassword(req.body.password);
+
+
+  return models.Users.create({'username': req.body.username, 'password': hashedPassword})
+    .then(() => {
+      //res.status(200);
+      res.end();
+    })
+    .error(error => {
+      res.status(500).send(error);
+    })
+    .catch(user => {
+      res.status(200).send(user);
+    })
+
 });
 
 /************************************************************/
